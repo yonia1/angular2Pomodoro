@@ -1,3 +1,8 @@
 <h1>
   {{title}}
 </h1>
+<h3>{{pomodoro.timer}}</h3>
+<button (click)="onStart()">Start</button>
+<button *ngIf="pomodoro.isRunning" (click)="onPause()">Pause</button>
+<button *ngIf="!pomodoro.isRunning" (click)="onResume()">Resume</button>
+<button (click)="onReset()">Reset</button>

@@ -16,11 +16,13 @@ export interface PomodroConfig {
 
 /**
  * Creating a basic timer with default values
+ * First stage using simple timer
  */
 @Injectable()
 export class PomodoroServiceService {
 
   constructor() {
+
   }
 
   /**
@@ -44,18 +46,28 @@ export class PomodoroServiceService {
    *
    */
   public currentIteration:number;
-
+  /**
+   *
+   */
   private isRunning:boolean;
-
+  /**
+   *
+   */
   private phase:PomodoroPhase;
+  /**
+   *
+   */
+  private timer : number;
+
+  private activeTimer :any;
 
   /**
    *
    * @param config
    */
   public initPopodoro(config?: PomodroConfig  ) {
-
-    this.currentIteration = 1;
+    this.clean();
+    this.currentIteration = 0;
     this.isRunning = false;
     this.phase = PomodoroPhase.INIT;
     this.numberOfSprints = config && config.numberOfSprints || 4;
@@ -65,21 +77,53 @@ export class PomodoroServiceService {
 
 
   }
-
+  public reset() {
+    this.isRunning = false;
+    this.clean();
+    this.initPopodoro();
+    this.startPomodoro();
+  }
   /**
    *
    */
   public pausePomodoro() {
     this.isRunning = false;
+    this.clean();
 
 
   }
+  public resume() {
+    this.isRunning = true;
+    this.continuePomodoro();
+  }
+  private clean(){
+      clearTimeout(this.activeTimer);
+      this.activeTimer = null;
+      }
 
   /**
    *
    */
-  public continuePomodoro() {
+  startPomodoro() {
     this.isRunning = true;
+    this.onPhaseChange();
+  }
+  /**
+   *
+   */
+  public continuePomodoro() {
+     if ( ! this.isRunning) return;
+     this.activeTimer = window.setTimeout(
+      ()=>{
+
+        console.log('timer fire');
+
+        this.timer--;
+        if(! this.isRunning) return ;
+        if(this.timer>0 && this.isRunning) this.continuePomodoro();
+        else if ( this.isRunning ) this.onPhaseChange();
+      }
+      ,1000);
   }
 
   /**
@@ -88,24 +132,31 @@ export class PomodoroServiceService {
    */
   public onPhaseChange() {
 
-    this.currentIteration++;
 
+    console.log(this.phase);
     switch (this.phase) {
       case  PomodoroPhase.INIT :
       {
         this.phase = PomodoroPhase.SPRINT;
+        this.timer = this.sprint_duration;
+     //   this.continuePomodoro();
         break;
       }
       case  PomodoroPhase.SPRINT :
       {
+
         if (this.currentIteration < this.numberOfSprints) {
           this.phase = PomodoroPhase.SHORT_BREAK;
+          this.timer = this.short_break_duration;
+       //   this.continuePomodoro();
 
 
         }
-        else
+        else {
           this.phase = PomodoroPhase.LONG_BREAK;
-
+          this.timer = this.long_break_duration;
+          //   this.continuePomodoro();
+        }
         break;
 
       }
@@ -114,12 +165,16 @@ export class PomodoroServiceService {
      */
       case  PomodoroPhase.SHORT_BREAK :
       {
+        this.currentIteration++;
         this.phase = PomodoroPhase.SPRINT;
+        this.timer = this.sprint_duration;
+       // this.continuePomodoro();
         break;
       }
       // Pomodoro cycle has finished
       case  PomodoroPhase.LONG_BREAK :
       {
+        this.currentIteration++;
         this.initPopodoro();
         return;
       }
@@ -127,7 +182,8 @@ export class PomodoroServiceService {
 
 
     } // End switch
-
+    console.log(this.phase);
+    this.continuePomodoro();
 
   }
 }

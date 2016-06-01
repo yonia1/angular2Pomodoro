@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
-import {Observable,IntervalObservable} from '../../../tmp/vendor-input_base_path-EtAM5fM1.tmp/0/rxjs/Rx.d';
+//import { Injectable } from '@angular/core';
+//import {Observable} from 'rxjs/Rx';
+//import {TimerObservable} from'rxjs/add/observable/timer';
+//import 'rxjs/add/operator/map';
 /**
  * Timer wrraper Engine
- */
+
 const SECONDSFACTOR =  1000;
+
 
 @Injectable()
 export class TimerServiceService {
@@ -20,7 +23,7 @@ export class TimerServiceService {
 
   start(seconds : number) : Observable{
     this.currentCountDown = seconds * SECONDSFACTOR;
-    this.timer = (<any>Observable).tigit mer(1000,this.currentCountDown);
+    this.timer = (<any>Observable).timer(SECONDSFACTOR,this.currentCountDown);
     this.timer.subscribe( ()=>{
       this.currentCountDown--;
     });
@@ -36,3 +39,4 @@ export class TimerServiceService {
   }
 
 }
+*/
