@@ -1,8 +1,21 @@
 <h1>
   {{title}}
 </h1>
-<h3>{{pomodoro.timer}}</h3>
+<h3>{{pomodoro.timer}}</h3><br>
+<h3 *ngIf="pomodoro.isRunning" >Current pomodoro : {{pomodoro.currentIteration}}</h3>
 <button (click)="onStart()">Start</button>
 <button *ngIf="pomodoro.isRunning" (click)="onPause()">Pause</button>
 <button *ngIf="!pomodoro.isRunning" (click)="onResume()">Resume</button>
 <button (click)="onReset()">Reset</button>
+
+<div *ngIf="!pomodoro.isRunning">
+  <h3>Set Pomodore</h3>
+  <label>Duration</label>
+  <input type="text" [(ngModel)]="config.sprint_duration">
+  <label>Number of sprintis</label>
+  <input type="text" [(ngModel)]="config.numberOfSprints">
+  <label>Short break</label>
+  <input type="text" [(ngModel)]="config.short_break_duration">
+  <label>Long break</label>
+  <input type="text" [(ngModel)]="config.long_break_duration">
+</div>

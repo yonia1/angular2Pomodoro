@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import {SoundService} from './sound-service.service'
 export enum PomodoroPhase{
   SPRINT, SHORT_BREAK, LONG_BREAK, INIT
 }
@@ -21,8 +21,8 @@ export interface PomodroConfig {
 @Injectable()
 export class PomodoroServiceService {
 
-  constructor() {
-
+  constructor(private soundService: SoundService) {
+    this.initPopodoro();
   }
 
   /**
@@ -67,13 +67,14 @@ export class PomodoroServiceService {
    */
   public initPopodoro(config?: PomodroConfig  ) {
     this.clean();
-    this.currentIteration = 0;
+    this.currentIteration = 1;
     this.isRunning = false;
     this.phase = PomodoroPhase.INIT;
     this.numberOfSprints = config && config.numberOfSprints || 4;
     this.short_break_duration = config && config.short_break_duration || 5;
     this.sprint_duration =config && config.sprint_duration || 25;
     this.long_break_duration =config && config.long_break_duration || 15;
+    this.timer = this.sprint_duration;
 
 
   }
@@ -81,7 +82,7 @@ export class PomodoroServiceService {
     this.isRunning = false;
     this.clean();
     this.initPopodoro();
-    this.startPomodoro();
+    //this.startPomodoro();
   }
   /**
    *
@@ -120,7 +121,7 @@ export class PomodoroServiceService {
 
         this.timer--;
         if(! this.isRunning) return ;
-        if(this.timer>0 && this.isRunning) this.continuePomodoro();
+        if(this.timer > 0 && this.isRunning) this.continuePomodoro();
         else if ( this.isRunning ) this.onPhaseChange();
       }
       ,1000);
@@ -139,22 +140,25 @@ export class PomodoroServiceService {
       {
         this.phase = PomodoroPhase.SPRINT;
         this.timer = this.sprint_duration;
-     //   this.continuePomodoro();
         break;
       }
       case  PomodoroPhase.SPRINT :
       {
 
         if (this.currentIteration < this.numberOfSprints) {
+
           this.phase = PomodoroPhase.SHORT_BREAK;
           this.timer = this.short_break_duration;
+          this.alert();
        //   this.continuePomodoro();
 
 
         }
         else {
+          console.log('sprint finsh moving to long break')
           this.phase = PomodoroPhase.LONG_BREAK;
           this.timer = this.long_break_duration;
+          this.alert();
           //   this.continuePomodoro();
         }
         break;
@@ -167,6 +171,7 @@ export class PomodoroServiceService {
       {
         this.currentIteration++;
         this.phase = PomodoroPhase.SPRINT;
+        this.alert();
         this.timer = this.sprint_duration;
        // this.continuePomodoro();
         break;
@@ -174,6 +179,7 @@ export class PomodoroServiceService {
       // Pomodoro cycle has finished
       case  PomodoroPhase.LONG_BREAK :
       {
+        this.alert();
         this.currentIteration++;
         this.initPopodoro();
         return;
@@ -182,8 +188,13 @@ export class PomodoroServiceService {
 
 
     } // End switch
+    console.log('current iteration ' +this.currentIteration);
     console.log(this.phase);
     this.continuePomodoro();
 
   }
+
+  private alert(){
+    this.soundService.alert();
+      }
 }

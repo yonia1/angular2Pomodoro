@@ -17,10 +17,19 @@ export class AngularPomodoroAppComponent {
   }
 
   public title = 'angular-pomodoro works!';
-  
-  
+  config = {
+    numberOfSprints : 4,
+
+    sprint_duration : 25,
+
+     short_break_duration : 5 ,
+
+    long_break_duration : 15,
+  };
+
+
   onStart() {
-    this.pomodoro.initPopodoro();
+    this.pomodoro.initPopodoro(this.config);
     this.pomodoro.startPomodoro();
   }
 
